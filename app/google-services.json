@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "947261308596",
+    "firebase_url": "https://agstar-cropcare-manager.firebaseio.com",
+    "project_id": "agstar-cropcare-manager",
+    "storage_bucket": "agstar-cropcare-manager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947261308596:android:81b6ab91f351e4b6",
+        "android_client_info": {
+          "package_name": "project.emarge.cropcare_manager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "947261308596-kg5dv35k9gfpqh4g6cg6h2b02gisc3te.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWQgiI_bh6F4jU6YzbZCbuUDMJVQ7-Vo4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "947261308596-kg5dv35k9gfpqh4g6cg6h2b02gisc3te.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
