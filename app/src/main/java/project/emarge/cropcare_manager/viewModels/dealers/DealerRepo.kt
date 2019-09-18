@@ -53,6 +53,7 @@ class DealerRepo(application: Application) {
     val userID = encryptedPreferences.getInt(USER_ID, 0)
 
 
+/*
     fun updateDealerLocation(
             location: LatLng,
             dealer: Dealer, selectedImagefilePath: Uri, phoneNumber: String,isCam : Boolean
@@ -122,6 +123,7 @@ class DealerRepo(application: Application) {
 
 
 
+
             if(  (selectedImagefilePath != Uri.EMPTY)   &&   (filePath == "")  ){
                 Toast.makeText(app, "Image capture error,Please try again", Toast.LENGTH_LONG).show()
             }else{
@@ -141,7 +143,7 @@ class DealerRepo(application: Application) {
 
                         override fun onComplete() {
                             data.postValue(dealerObject)
-                            savePaymentImageDetails(dealer)
+                            savePaymentImage(dealer)
 
                         }
                     })
@@ -154,6 +156,116 @@ class DealerRepo(application: Application) {
 
         return data
     }
+*/
+
+
+
+
+    fun updateDealerLocationWithImage(
+        location: LatLng,
+        dealer: Dealer, selectedImagefilePath: Uri, phoneNumber: String,isCam : Boolean
+    ): MutableLiveData<Dealer> {
+
+
+        val data = MutableLiveData<Dealer>()
+        var dealerObject = Dealer()
+
+
+        if (!app.isConnectedToNetwork()) {
+            Toast.makeText(app, "You need internet connection to process this", Toast.LENGTH_LONG).show()
+
+        } else if( (!phoneNumber.isNullOrEmpty())  && (phoneNumber.length != 11) ){
+            Toast.makeText(app, "Invalid phone number ex - 94711111111", Toast.LENGTH_LONG).show()
+        }else {
+
+            var filePath: String = ""
+            var imageCode: String = ""
+
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("ID", dealer.dealerID)
+            jsonObject.addProperty("Latitude", location.latitude)
+            jsonObject.addProperty("Longtitude", location.longitude)
+
+
+            if (selectedImagefilePath == Uri.EMPTY) {
+
+            } else {
+                imageCode = genarateImageCode()
+                dealer.dealerImage = selectedImagefilePath
+                dealer.dealerImageCode = imageCode
+                dealer.isImageFromCamera = isCam
+
+                try {
+                    filePath = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if(isCam){
+                                selectedImagefilePath.path.toString()
+                            }else{
+                                addImagesUpKitKat(selectedImagefilePath)
+                            }
+                        }else{
+                            addImagesUpKitKat(selectedImagefilePath)
+                        }
+                    }else{
+                        addImages(selectedImagefilePath)
+                    }
+                }catch (ex : Exception){
+
+                }
+
+
+
+                if (filePath == "") {
+
+                } else {
+                    val file = File(filePath)
+                    dealer.dealerImageName = file.name
+                    dealer.dealerImagePath = filePath
+                }
+
+            }
+            jsonObject.addProperty("ImageCode", imageCode)
+            jsonObject.addProperty("ContactNo", phoneNumber)
+
+            jsonObject.addProperty("ImageTypeID", 4)
+            jsonObject.addProperty("Name", dealer.dealerImageName)
+
+
+            println("yyyyyyyyyyyyyy : "+jsonObject)
+
+            if(  (selectedImagefilePath != Uri.EMPTY)   &&   (filePath == "")  ){
+                Toast.makeText(app, "Image capture error,Please try again", Toast.LENGTH_LONG).show()
+            }else{
+
+                apiInterface!!.updateDealerwithImageDetails(jsonObject)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : Observer<Dealer> {
+                        override fun onSubscribe(d: Disposable) {}
+                        override fun onNext(log: Dealer) {
+                            dealerObject = log
+                        }
+
+                        override fun onError(e: Throwable) {
+                            Toast.makeText(app, networkErrorHandler(e).errorTitle, Toast.LENGTH_LONG).show()
+                        }
+
+                        override fun onComplete() {
+                            data.postValue(dealerObject)
+                            savePaymentImage(dealer)
+
+                        }
+                    })
+
+            }
+
+
+
+        }
+
+        return data
+    }
+
 
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -280,52 +392,6 @@ class DealerRepo(application: Application) {
         return "com.google.android.apps.photos.content" == uri.authority
     }
 
-    fun savePaymentImageDetails(dealer: Dealer) {
-        if (!app.isConnectedToNetwork()) {
-        } else {
-            val locJsonArr = JsonArray()
-
-            if (dealer.dealerImageCode.isNullOrEmpty()) {
-            } else {
-
-                val ob = JsonObject()
-                ob.addProperty("ImageCode", dealer.dealerImageCode)
-                ob.addProperty("ImageTypeID", 4)
-                ob.addProperty("Name", dealer.dealerImageName)
-                locJsonArr.add(ob)
-
-
-
-
-                apiInterface.saveImageDetails(locJsonArr)
-                        .subscribeOn(Schedulers.io())
-                        .doOnError { }
-                        .doOnTerminate { }
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<Image> {
-                            override fun onSubscribe(d: Disposable) {
-                            }
-
-                            override fun onNext(log: Image) {
-                            }
-
-                            override fun onError(e: Throwable) {
-                                Toast.makeText(app, networkErrorHandler(e).errorTitle, Toast.LENGTH_LONG).show()
-                            }
-
-                            override fun onComplete() {
-                                Toast.makeText(app, "Image Details Upload Complete", Toast.LENGTH_LONG).show()
-                                savePaymentImage(dealer)
-                            }
-                        })
-
-
-            }
-
-
-        }
-
-    }
 
 
     fun savePaymentImage(dealer: Dealer) {

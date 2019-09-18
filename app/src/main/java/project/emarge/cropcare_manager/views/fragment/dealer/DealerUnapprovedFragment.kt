@@ -132,12 +132,17 @@ class DealerUnapprovedFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
 
     override fun onStart() {
         super.onStart()
+
         fusedLocationClient = activity?.let { LocationServices.getFusedLocationProviderClient(it) }!!
+
+
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 onLocationChanged(locationResult!!.lastLocation)
             }
         }
+
+
         locationCallbackRefrash = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 onLocationChangedRefrash(locationResult!!.lastLocation)
@@ -153,6 +158,9 @@ class DealerUnapprovedFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
         } else {
             createLocationRequest()
         }
+
+
+
         getDealers()
         root.swiperefresh_dealerunapproved_items.setOnRefreshListener {
             getDealers()
@@ -435,6 +443,8 @@ class DealerUnapprovedFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMar
 
     override fun onMapReady(p0: GoogleMap?) {
         MapsInitializer.initialize(context)
+
+
         mMap = p0!!
 
         mMap.uiSettings.isMyLocationButtonEnabled = false

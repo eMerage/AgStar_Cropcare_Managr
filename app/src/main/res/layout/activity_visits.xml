@@ -36,6 +36,26 @@
                     android:layout_height="match_parent"
                     android:layout_marginTop="?attr/actionBarSize">
 
+                <RelativeLayout
+                    android:id="@+id/relativeLayout_imagecount"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:elevation="5dp">
+
+                    <TextView
+                        android:id="@+id/textview_imagecount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fontFamily="@font/roboto_black"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:visibility="visible"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="15sp"/>
+
+
+                </RelativeLayout>
+
 
                 <TextView
                         android:id="@+id/textview_novisits"
@@ -53,6 +73,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerView_visits"
                         android:layout_width="match_parent"
+                    android:layout_below="@+id/relativeLayout_imagecount"
                         android:orientation="vertical"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         tools:listitem="@layout/listview_visits"
