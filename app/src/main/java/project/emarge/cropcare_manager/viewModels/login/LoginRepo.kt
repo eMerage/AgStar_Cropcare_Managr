@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import android.widget.Toast
 import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
@@ -79,8 +80,11 @@ class LoginRepo(application: Application) {
 
 
     fun getUserDetails(
-        user: MutableLiveData<String>, password: MutableLiveData<String>, isRememberMeChecked: Boolean,
-        isLoading: ObservableField<Boolean>, buttonVisibale: ObservableField<Boolean>
+        user: MutableLiveData<String>,
+        password: MutableLiveData<String>,
+        isRememberMeChecked: Boolean,
+        isLoading: ObservableField<Boolean>,
+        buttonVisibale: ObservableField<Boolean>
     ): MutableLiveData<Rep> {
         val data = MutableLiveData<Rep>()
         var loginUser = Rep()
@@ -88,48 +92,62 @@ class LoginRepo(application: Application) {
         isLoading.set(true)
         buttonVisibale.set(false)
 
-        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener(OnCompleteListener { task ->
+        try {
+            FirebaseInstanceId.getInstance()
+                .instanceId.addOnCompleteListener(OnCompleteListener { task ->
 
-            apiInterface.validateUser(user.value.toString(), password.value.toString(), 1, task.result?.token!!)
-                .subscribeOn(Schedulers.io())
-                .doOnError { it }
-                .doOnTerminate { }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Rep> {
-                    override fun onSubscribe(d: Disposable) {
-                    }
-
-                    override fun onNext(log: Rep) {
-                        loginUser = log
-                        data.postValue(loginUser)
-                        if (isRememberMeChecked) {
-                            encryptedPreferences.edit().putBoolean(USER_REMEMBER, true).apply()
-                        } else {
-                           encryptedPreferences.edit().putBoolean(USER_REMEMBER, false).apply()
+                apiInterface.validateUser(
+                    user.value.toString(),
+                    password.value.toString(),
+                    1,
+                    task.result?.token!!
+                )
+                    .subscribeOn(Schedulers.io())
+                    .doOnError { it }
+                    .doOnTerminate { }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : Observer<Rep> {
+                        override fun onSubscribe(d: Disposable) {
                         }
 
-                    }
-
-                    override fun onError(e: Throwable) {
-                        isLoading.set(false)
-                        buttonVisibale.set(true)
-                        loginUser.loginNetworkError = networkErrorHandler(e)
-                        data.postValue(loginUser)
-                    }
-
-                    override fun onComplete() {
-                        if(loginUser.userStatus){
-                            encryptedPreferences.edit().putInt(USER_ID, loginUser.userID).apply()
-                            encryptedPreferences.edit().putString(USER_NAME, loginUser.name).apply()
-                        }else{
+                        override fun onNext(log: Rep) {
+                            loginUser = log
+                            data.postValue(loginUser)
+                            if (isRememberMeChecked) {
+                                encryptedPreferences.edit().putBoolean(USER_REMEMBER, true).apply()
+                            } else {
+                                encryptedPreferences.edit().putBoolean(USER_REMEMBER, false).apply()
+                            }
 
                         }
-                        isLoading.set(false)
-                        buttonVisibale.set(true)
 
-                    }
-                })
-        })
+                        override fun onError(e: Throwable) {
+                            isLoading.set(false)
+                            buttonVisibale.set(true)
+                            loginUser.loginNetworkError = networkErrorHandler(e)
+                            data.postValue(loginUser)
+                        }
+
+                        override fun onComplete() {
+                            if (loginUser.userStatus) {
+                                encryptedPreferences.edit().putInt(USER_ID, loginUser.userID)
+                                    .apply()
+                                encryptedPreferences.edit().putString(USER_NAME, loginUser.name)
+                                    .apply()
+                            } else {
+
+                            }
+                            isLoading.set(false)
+                            buttonVisibale.set(true)
+
+                        }
+                    })
+            })
+        } catch (ex: Exception) {
+            Toast.makeText(app, "Login fail,Please try again", Toast.LENGTH_LONG).show()
+        }
+
+
 
         return data
     }
