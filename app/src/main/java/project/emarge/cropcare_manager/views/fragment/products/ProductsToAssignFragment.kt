@@ -68,14 +68,14 @@ class ProductsToAssignFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        getReps()
-        getProductCategory()
-        getProducts(selectedProCategoryID)
+       // getReps()
+    //    getProductCategory()
+     //   getProducts(selectedProCategoryID)
 
 
 
 
-        root.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+      /*  root.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 var selectedProductsCategory: ProductsCategory = parent.getItemAtPosition(position) as ProductsCategory
                 selectedProCategoryID = selectedProductsCategory.productsID!!
@@ -138,7 +138,7 @@ class ProductsToAssignFragment : Fragment() {
                     }
                 })
 
-        }
+        }*/
 
 
     }
