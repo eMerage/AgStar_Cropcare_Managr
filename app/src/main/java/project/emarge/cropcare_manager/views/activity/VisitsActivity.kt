@@ -116,8 +116,6 @@ class VisitsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
 
 
 
-
-
         bindingVisits.visits!!.getVisitsFromServer().observe(this, Observer<ArrayList<Visits>> {
             it?.let { result ->
                 list = result
